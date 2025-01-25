@@ -13,6 +13,7 @@ const StitchSVGComponent: React.FC<StitchSVGProps> = ({ type, orientation, color
   const center = size / 2;
   const strokeWidth = size / 10;
   const edgeOffset = size * 0.15; // Edge offset for backstitch
+  const solidPadding = size * 0.15; // 15% padding for solid stitch
   
   const getRotation = () => {
     return `rotate(${orientation * 90} ${center} ${center})`;
@@ -20,6 +21,17 @@ const StitchSVGComponent: React.FC<StitchSVGProps> = ({ type, orientation, color
 
   const renderStitch = () => {
     switch (type) {
+      case 'Solid':
+        return (
+          <rect
+            x={solidPadding}
+            y={solidPadding}
+            width={size - (solidPadding * 2)}
+            height={size - (solidPadding * 2)}
+            fill={colorString}
+          />
+        );
+
       case 'Full':
         return (
           <>
@@ -33,6 +45,28 @@ const StitchSVGComponent: React.FC<StitchSVGProps> = ({ type, orientation, color
             />
             <line 
               x1={size * 0.8} 
+              y1={size * 0.2} 
+              x2={size * 0.2} 
+              y2={size * 0.8} 
+              stroke={colorString} 
+              strokeWidth={strokeWidth} 
+            />
+          </>
+        );
+
+      case 'Half-Full':
+        return (
+          <>
+            <line 
+              x1={size * 0.2} 
+              y1={size * 0.2} 
+              x2={center} 
+              y2={size * 0.8} 
+              stroke={colorString} 
+              strokeWidth={strokeWidth} 
+            />
+            <line 
+              x1={center} 
               y1={size * 0.2} 
               x2={size * 0.2} 
               y2={size * 0.8} 

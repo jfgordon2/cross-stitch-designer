@@ -10,6 +10,7 @@ interface ToolbarProps {
   selectedStitch: StitchType;
   selectedOrientation: string;
   selectedColor: Color;
+  customColors?: Color[];
   width: string;
   height: string;
   project: Project;
@@ -17,6 +18,7 @@ interface ToolbarProps {
   onStitchChange: (stitch: StitchType) => void;
   onOrientationChange: (orientation: string) => void;
   onColorChange: (color: Color) => void;
+  onCustomColorAdd?: (color: Color) => void;
   onWidthChange: (width: string) => void;
   onHeightChange: (height: string) => void;
   onResize: () => void;
@@ -28,6 +30,7 @@ export const Toolbar = React.memo<ToolbarProps>(({
   selectedStitch,
   selectedOrientation,
   selectedColor,
+  customColors,
   width,
   height,
   project,
@@ -35,6 +38,7 @@ export const Toolbar = React.memo<ToolbarProps>(({
   onStitchChange,
   onOrientationChange,
   onColorChange,
+  onCustomColorAdd,
   onWidthChange,
   onHeightChange,
   onResize,
@@ -119,7 +123,9 @@ export const Toolbar = React.memo<ToolbarProps>(({
           <label>Color:</label>
           <ColorSelect
             selectedColor={selectedColor}
+            customColors={customColors}
             onColorChange={onColorChange}
+            onCustomColorAdd={onCustomColorAdd}
           />
         </div>
 

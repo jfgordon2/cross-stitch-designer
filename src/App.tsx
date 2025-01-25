@@ -17,17 +17,53 @@ import './print.css';
 const createInitialProject = (width: number, height: number) => 
   createNewProject(width, height);
 
+const isColorEqual = (a: Color, b: Color) =>
+  a.r === b.r && a.g === b.g && a.b === b.b && a.a === b.a;
+
+const isDefaultColor = (color: Color) =>
+  COLORS.some(defaultColor => isColorEqual(defaultColor, color));
+
+const extractCustomColors = (project: Project): Color[] => {
+  const uniqueColors = new Set<string>();
+  const customColors: Color[] = [];
+
+  project.grid.forEach(row => {
+    row.forEach(cell => {
+      cell.stitches.forEach(stitch => {
+        const colorKey = `${stitch.color.r},${stitch.color.g},${stitch.color.b},${stitch.color.a}`;
+        if (!isDefaultColor(stitch.color) && !uniqueColors.has(colorKey)) {
+          uniqueColors.add(colorKey);
+          customColors.push(stitch.color);
+        }
+      });
+    });
+  });
+
+  return customColors;
+};
+
 function App() {
   const [project, setProject] = useState<Project>(() => 
     createInitialProject(GRID_CONSTANTS.defaultGridSize, GRID_CONSTANTS.defaultGridSize)
   );
   
   const [selectedColor, setSelectedColor] = useState<Color>(COLORS[0]);
+  const [customColors, setCustomColors] = useState<Color[]>([]);
   const [selectedStitch, setSelectedStitch] = useState<StitchType>("Full");
   const [selectedOrientation, setSelectedOrientation] = useState<string>("0");
   const [width, setWidth] = useState(GRID_CONSTANTS.defaultGridSize.toString());
   const [height, setHeight] = useState(GRID_CONSTANTS.defaultGridSize.toString());
   const gridRef = useRef<HTMLDivElement>(null);
+
+  const handleCustomColorAdd = useCallback((color: Color) => {
+    setCustomColors(prevColors => {
+      // Don't add if it's a default color or already exists
+      if (isDefaultColor(color) || prevColors.some(c => isColorEqual(c, color))) {
+        return prevColors;
+      }
+      return [...prevColors, color];
+    });
+  }, []);
 
   const handleCellUpdate = useCallback((row: number, col: number, stitch: Stitch) => {
     setProject(currentProject => {
@@ -49,7 +85,10 @@ function App() {
         return currentProject;
       }
     });
-  }, []);
+
+    // Add color to custom colors if it's not a default color
+    handleCustomColorAdd(selectedColor);
+  }, [selectedColor, handleCustomColorAdd]);
 
   const handleResize = useCallback(() => {
     const newWidth = parseInt(width, 10);
@@ -84,6 +123,7 @@ function App() {
       setProject(loadedProject);
       setWidth(loadedProject.width.toString());
       setHeight(loadedProject.height.toString());
+      setCustomColors(extractCustomColors(loadedProject));
     } catch (error) {
       console.error('Failed to load project:', error);
       alert('Failed to load project: ' + (error instanceof Error ? error.message : 'Unknown error'));
@@ -97,6 +137,7 @@ function App() {
           selectedStitch={selectedStitch}
           selectedOrientation={selectedOrientation}
           selectedColor={selectedColor}
+          customColors={customColors}
           width={width}
           height={height}
           project={project}
@@ -104,6 +145,7 @@ function App() {
           onStitchChange={setSelectedStitch}
           onOrientationChange={setSelectedOrientation}
           onColorChange={setSelectedColor}
+          onCustomColorAdd={handleCustomColorAdd}
           onWidthChange={setWidth}
           onHeightChange={setHeight}
           onResize={handleResize}

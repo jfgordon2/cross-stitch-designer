@@ -5,7 +5,9 @@ import './ColorSelect.css';
 
 interface ColorSelectProps {
   selectedColor: Color;
+  customColors?: Color[];
   onColorChange: (color: Color) => void;
+  onCustomColorAdd?: (color: Color) => void;
 }
 
 // Memoized color swatch component
@@ -65,7 +67,9 @@ ColorSlider.displayName = 'ColorSlider';
 
 const ColorSelectComponent: React.FC<ColorSelectProps> = ({
   selectedColor,
+  customColors = [],
   onColorChange,
+  onCustomColorAdd,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCustomMode, setIsCustomMode] = useState(false);
@@ -95,6 +99,14 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
     a.r === b.r && a.g === b.g && a.b === b.b && a.a === b.a,
   []);
 
+  const handleAddCustomColor = useCallback(() => {
+    onColorChange(customColor);
+    if (onCustomColorAdd) {
+      onCustomColorAdd(customColor);
+    }
+    setIsOpen(false);
+  }, [customColor, onColorChange, onCustomColorAdd]);
+
   return (
     <div ref={containerRef} className="color-select">
       <button
@@ -108,7 +120,7 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
       {isOpen && (
         <div className="color-dropdown">
           <div className="color-grid">
-            {COLORS.map((color, index) => (
+            {[...COLORS, ...customColors].map((color, index) => (
               <ColorSwatch
                 key={index}
                 color={color}
@@ -135,10 +147,7 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
               <ColorSlider color={customColor} channel="b" onChange={handleCustomColorChange} />
               <ColorSlider color={customColor} channel="a" onChange={handleCustomColorChange} />
               <button
-                onClick={() => {
-                  onColorChange(customColor);
-                  setIsOpen(false);
-                }}
+                onClick={handleAddCustomColor}
                 className="custom-color-preview"
                 style={{
                   backgroundColor: `rgba(${customColor.r}, ${customColor.g}, ${customColor.b}, ${customColor.a / 255})`

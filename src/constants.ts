@@ -13,10 +13,12 @@ export const GRID_CONSTANTS = {
 // Stitch Types and Orientations
 export const ORIENTATION_OPTIONS = {
     "Full": ["0"],
+    "Half-Full": ["0", "1", "2", "3"],
     "3/4": ["0", "1", "2", "3"],
     "1/2": ["0", "1"],
     "1/4": ["0", "1", "2", "3"],
     "Back": ["0", "1", "2", "3"],
+    "Solid": ["0"],
 } as const;
 
 // Default Colors
