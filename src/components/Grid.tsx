@@ -123,34 +123,11 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
     if (mode !== 'edit') return; // Only allow editing in edit mode
     
     try {
-      const currentStitches = project.grid[row][col].stitches;
-      const existingStitchIndex = currentStitches.findIndex(
-        stitch => stitch.stitchType === selectedStitch
-      );
-
-      let newStitch: Stitch | null = null;
-      if (existingStitchIndex >= 0) {
-        // If stitch type exists, toggle orientation or remove if same orientation
-        const existingStitch = currentStitches[existingStitchIndex];
-        const newOrientation = parseInt(selectedOrientation, 10) as Orientation;
-        
-        if (existingStitch.orientation === newOrientation) {
-          // Remove stitch if same orientation
-          newStitch = null;
-        } else {
-          // Update orientation if different
-          newStitch = {
-            stitchType: selectedStitch,
-            orientation: newOrientation,
-            color: selectedColor
-          };
-        }
-      } else {
-        // Add new stitch if type doesn't exist
-        newStitch = createStitch(selectedColor, selectedStitch, selectedOrientation);
-      }
-
-      onCellUpdate(row, col, newStitch || { stitchType: selectedStitch, orientation: 0 as Orientation, color: selectedColor });
+      // Create new stitch with current properties
+      const newStitch = createStitch(selectedColor, selectedStitch, selectedOrientation);
+      
+      // Pass to onCellUpdate which will handle the array management via toggleStitchInCell
+      onCellUpdate(row, col, newStitch);
     } catch (error) {
       console.error('Failed to update cell:', error);
     }
@@ -239,6 +216,7 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
         {/* Grid layer */}
         <canvas
           ref={canvasRef}
+          data-grid="true"
           width={project.width * cellSize}
           height={project.height * cellSize}
           onMouseDown={handleMouseDown}
@@ -249,7 +227,7 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
             position: 'absolute',
             top: 0,
             left: 0,
-            zIndex: 2,
+            zIndex: 1,
             border: '1px solid #ccc',
             cursor: mode === 'edit' ? 'crosshair' : 'default',
           }}
@@ -262,7 +240,9 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
             position: 'absolute',
             top: 0,
             left: 0,
-            zIndex: 3,
+            width: `${width}px`,
+            height: `${height}px`,
+            zIndex: 2,
             pointerEvents: 'none',
           }}
         >
