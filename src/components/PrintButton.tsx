@@ -1,5 +1,6 @@
 import React from 'react';
 import { Project, GridRef } from '../types';
+import printerIcon from '../assets/printer-outline.svg';
 
 interface PrintButtonProps {
   project: Project;
@@ -247,8 +248,9 @@ export const PrintButton: React.FC<PrintButtonProps> = ({ project, gridRef }) =>
     <button
       onClick={handlePrint}
       className="toolbar-button"
+      title="Print Project"
     >
-      Print
+      <img src={printerIcon} alt="Print Project" />
     </button>
   );
 };

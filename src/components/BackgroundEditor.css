@@ -1,13 +1,5 @@
 .background-controls {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.background-controls .toolbar-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  display: contents;
 }
 
 .background-editor-modal {

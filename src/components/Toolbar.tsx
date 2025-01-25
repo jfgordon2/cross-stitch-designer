@@ -5,6 +5,9 @@ import { OrientationSelect } from './OrientationSelect';
 import { ColorSelect } from './ColorSelect';
 import { PrintButton } from './PrintButton';
 import { BackgroundEditor } from './BackgroundEditor';
+import downloadIcon from '../assets/file-download-outline.svg';
+import uploadIcon from '../assets/file-upload-outline.svg';
+import gridIcon from '../assets/view-grid-plus-outline.svg';
 import './Toolbar.css';
 
 interface ToolbarProps {
@@ -124,7 +127,7 @@ export const Toolbar = React.memo<ToolbarProps>(({
           />
         </div>
 
-        <div className="toolbar-group">
+        <div className="toolbar-group has-separator">
           <label>Color:</label>
           <ColorSelect
             selectedColor={selectedColor}
@@ -134,7 +137,7 @@ export const Toolbar = React.memo<ToolbarProps>(({
           />
         </div>
 
-        <div className="toolbar-group">
+        <div className="toolbar-group has-separator">
           <label>Width:</label>
           <input
             type="number"
@@ -151,15 +154,16 @@ export const Toolbar = React.memo<ToolbarProps>(({
             onChange={handleHeightChange}
             className="toolbar-input"
           />
-          <button 
+          <button
             onClick={onResize}
             className="toolbar-button"
+            title="Resize Grid"
           >
-            Resize Grid
+            <img src={gridIcon} alt="Resize Grid" />
           </button>
         </div>
 
-        <div className="toolbar-group">
+        <div className="toolbar-group toolbar-actions">
           <BackgroundEditor
             background={project.background}
             canvasWidth={project.width * 30}
@@ -167,20 +171,19 @@ export const Toolbar = React.memo<ToolbarProps>(({
             onBackgroundChange={onBackgroundChange}
             onModeChange={onModeChange}
           />
-        </div>
-
-        <div className="toolbar-group">
-          <button 
+          <button
             onClick={onSave}
             className="toolbar-button"
+            title="Save Project to Local"
           >
-            Save
+            <img src={downloadIcon} alt="Save Project" />
           </button>
-          <button 
+          <button
             onClick={onLoad}
             className="toolbar-button"
+            title="Upload Project from Local"
           >
-            Load
+            <img src={uploadIcon} alt="Upload Project" />
           </button>
           <PrintButton project={project} gridRef={gridRef} />
         </div>

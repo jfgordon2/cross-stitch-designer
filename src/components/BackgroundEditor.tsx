@@ -1,6 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { BackgroundImage, AppMode } from '../types';
 import './BackgroundEditor.css';
+import imageIcon from '../assets/image.svg';
+import imageEditIcon from '../assets/image-edit.svg';
 
 interface BackgroundEditorProps {
   background?: BackgroundImage;
@@ -112,15 +114,17 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
         <button
           onClick={() => fileInputRef.current?.click()}
           className="toolbar-button"
+          title="Add background"
         >
-          Add Background
+          <img src={imageIcon} alt="Add background" />
         </button>
       ) : (
-        <button 
+        <button
           onClick={() => setIsEditing(true)}
           className="toolbar-button"
+          title="Edit background"
         >
-          Edit Background
+          <img src={imageEditIcon} alt="Edit background" />
         </button>
       )}
 
