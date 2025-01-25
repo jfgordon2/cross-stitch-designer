@@ -71,3 +71,13 @@ label {
   font-size: 14px;
   font-weight: 500;
 }
+
+@media (max-width: 768px) {
+  .app {
+    padding-top: 0;
+  }
+
+  .grid-container {
+    padding-top: 48px; /* Space for the toggle button only */
+  }
+}

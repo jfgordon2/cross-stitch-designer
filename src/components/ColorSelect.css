@@ -1,0 +1,141 @@
+.color-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.color-select-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 200px;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-swatch.selected {
+  border: 2px solid #007bff;
+}
+
+.color-swatch:not(.selected) {
+  border: 1px solid #ccc;
+}
+
+.custom-color-button {
+  width: 100%;
+  padding: 4px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 32px;
+}
+
+.custom-color-button.active {
+  background-color: #e0e0e0;
+}
+
+.custom-color-button:not(.active) {
+  background-color: white;
+}
+
+.color-slider-container {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.color-slider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.color-slider label {
+  width: 20px;
+}
+
+.color-slider input[type="range"] {
+  flex: 1;
+}
+
+.color-slider input[type="number"] {
+  width: 50px;
+  padding: 2px 4px;
+}
+
+.custom-color-preview {
+  width: 100%;
+  height: 32px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .color-select-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .color-dropdown {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90vw;
+    width: max-content;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 16px;
+  }
+
+  .color-swatch,
+  .custom-color-button,
+  .custom-color-preview {
+    height: 40px;
+  }
+
+  .color-slider input[type="range"],
+  .color-slider input[type="number"] {
+    min-height: 40px;
+  }
+}

@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { Color, Project, StitchType } from '../types';
 import { ORIENTATION_OPTIONS } from '../constants';
 import { OrientationSelect } from './OrientationSelect';
 import { ColorSelect } from './ColorSelect';
 import { PrintButton } from './PrintButton';
+import './Toolbar.css';
 
 interface ToolbarProps {
   selectedStitch: StitchType;
@@ -23,28 +24,6 @@ interface ToolbarProps {
   onLoad: () => void;
 }
 
-const buttonStyle = {
-  padding: '4px 12px',
-  borderRadius: '4px',
-  border: '1px solid #ccc',
-  backgroundColor: 'white',
-  cursor: 'pointer'
-} as const;
-
-const inputStyle = {
-  width: '60px',
-  padding: '4px',
-  borderRadius: '4px',
-  border: '1px solid #ccc'
-} as const;
-
-const selectStyle = {
-  padding: '4px',
-  borderRadius: '4px',
-  border: '1px solid #ccc',
-  minWidth: '80px'
-} as const;
-
 export const Toolbar = React.memo<ToolbarProps>(({
   selectedStitch,
   selectedOrientation,
@@ -62,11 +41,30 @@ export const Toolbar = React.memo<ToolbarProps>(({
   onSave,
   onLoad,
 }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
   // Memoize stitch types to prevent recreation on each render
   const stitchTypes = useMemo(() => 
     Object.keys(ORIENTATION_OPTIONS) as StitchType[], 
     []
   );
+
+  // Set toolbar height CSS variable for mobile padding
+  useEffect(() => {
+    const updateToolbarHeight = () => {
+      if (toolbarRef.current && window.innerWidth <= 768) {
+        const height = toolbarRef.current.offsetHeight;
+        document.documentElement.style.setProperty('--toolbar-height', `${height}px`);
+      } else {
+        document.documentElement.style.setProperty('--toolbar-height', '0px');
+      }
+    };
+
+    updateToolbarHeight();
+    window.addEventListener('resize', updateToolbarHeight);
+    return () => window.removeEventListener('resize', updateToolbarHeight);
+  }, []);
 
   // Memoize handlers
   const handleStitchChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -85,85 +83,88 @@ export const Toolbar = React.memo<ToolbarProps>(({
   }, [onHeightChange]);
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      gap: '1rem', 
-      padding: '1rem', 
-      backgroundColor: '#f5f5f5', 
-      borderBottom: '1px solid #ccc',
-      alignItems: 'center'
-    }}>
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-        <label>Stitch:</label>
-        <select 
-          value={selectedStitch}
-          onChange={handleStitchChange}
-          style={selectStyle}
-        >
-          {stitchTypes.map(type => (
-            <option key={type} value={type}>{type}</option>
-          ))}
-        </select>
-      </div>
+    <>
+      <button 
+        className="toolbar-toggle"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        aria-label={isCollapsed ? "Expand toolbar" : "Collapse toolbar"}
+      >
+        {isCollapsed ? '↓' : '↑'}
+      </button>
 
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-        <label>Orientation:</label>
-        <OrientationSelect
-          selectedStitch={selectedStitch}
-          selectedOrientation={selectedOrientation}
-          onOrientationChange={onOrientationChange}
-        />
-      </div>
+      <div ref={toolbarRef} className={`toolbar ${isCollapsed ? 'collapsed' : ''}`}>
+        <div className="toolbar-group">
+          <label>Stitch:</label>
+          <select 
+            value={selectedStitch}
+            onChange={handleStitchChange}
+            className="toolbar-select"
+          >
+            {stitchTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-        <label>Color:</label>
-        <ColorSelect
-          selectedColor={selectedColor}
-          onColorChange={onColorChange}
-        />
-      </div>
+        <div className="toolbar-group">
+          <label>Orientation:</label>
+          <OrientationSelect
+            selectedStitch={selectedStitch}
+            selectedOrientation={selectedOrientation}
+            onOrientationChange={onOrientationChange}
+          />
+        </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-        <label>Width:</label>
-        <input
-          type="number"
-          min="1"
-          value={width}
-          onChange={handleWidthChange}
-          style={inputStyle}
-        />
-        <label>Height:</label>
-        <input
-          type="number"
-          min="1"
-          value={height}
-          onChange={handleHeightChange}
-          style={inputStyle}
-        />
-        <button 
-          onClick={onResize}
-          style={buttonStyle}
-        >
-          Resize Grid
-        </button>
-      </div>
+        <div className="toolbar-group">
+          <label>Color:</label>
+          <ColorSelect
+            selectedColor={selectedColor}
+            onColorChange={onColorChange}
+          />
+        </div>
 
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-        <button 
-          onClick={onSave}
-          style={buttonStyle}
-        >
-          Save
-        </button>
-        <button 
-          onClick={onLoad}
-          style={buttonStyle}
-        >
-          Load
-        </button>
-        <PrintButton project={project} gridRef={gridRef} />
+        <div className="toolbar-group">
+          <label>Width:</label>
+          <input
+            type="number"
+            min="1"
+            value={width}
+            onChange={handleWidthChange}
+            className="toolbar-input"
+          />
+          <label>Height:</label>
+          <input
+            type="number"
+            min="1"
+            value={height}
+            onChange={handleHeightChange}
+            className="toolbar-input"
+          />
+          <button 
+            onClick={onResize}
+            className="toolbar-button"
+          >
+            Resize Grid
+          </button>
+        </div>
+
+        <div className="toolbar-group">
+          <button 
+            onClick={onSave}
+            className="toolbar-button"
+          >
+            Save
+          </button>
+          <button 
+            onClick={onLoad}
+            className="toolbar-button"
+          >
+            Load
+          </button>
+          <PrintButton project={project} gridRef={gridRef} />
+        </div>
       </div>
-    </div>
+    </>
   );
 });
 

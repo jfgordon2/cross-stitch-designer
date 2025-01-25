@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import { Color } from '../types';
 import { COLORS } from '../constants';
+import './ColorSelect.css';
 
 interface ColorSelectProps {
   selectedColor: Color;
@@ -19,17 +20,9 @@ const ColorSwatch = memo(({
 }) => (
   <button
     onClick={onClick}
+    className={`color-swatch ${isSelected ? 'selected' : ''}`}
     style={{
-      width: '32px',
-      height: '32px',
-      border: isSelected ? '2px solid #007bff' : '1px solid #ccc',
-      borderRadius: '4px',
-      backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`,
-      cursor: 'pointer',
-      padding: 0,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
+      backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`
     }}
   />
 ));
@@ -46,15 +39,14 @@ const ColorSlider = memo(({
   channel: keyof Color; 
   onChange: (channel: keyof Color, value: number) => void;
 }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-    <label style={{ width: '20px' }}>{channel.toUpperCase()}:</label>
+  <div className="color-slider">
+    <label>{channel.toUpperCase()}:</label>
     <input
       type="range"
       min="0"
       max="255"
       value={color[channel]}
       onChange={(e) => onChange(channel, parseInt(e.target.value, 10))}
-      style={{ flex: 1 }}
     />
     <input
       type="number"
@@ -65,7 +57,6 @@ const ColorSlider = memo(({
         const value = Math.max(0, Math.min(255, parseInt(e.target.value || '0', 10)));
         onChange(channel, value);
       }}
-      style={{ width: '50px', padding: '2px 4px' }}
     />
   </div>
 ));
@@ -105,53 +96,18 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
   []);
 
   return (
-    <div 
-      ref={containerRef} 
-      style={{ 
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        height: '100%'
-      }}
-    >
+    <div ref={containerRef} className="color-select">
       <button
         onClick={() => setIsOpen(!isOpen)}
+        className="color-select-button"
         style={{
-          width: '32px',
-          height: '32px',
-          padding: 0,
-          backgroundColor: `rgba(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b}, ${selectedColor.a / 255})`,
-          border: '1px solid #ccc',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
+          backgroundColor: `rgba(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b}, ${selectedColor.a / 255})`
         }}
       />
 
       {isOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            marginTop: '4px',
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            padding: '8px',
-            zIndex: 1000,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            minWidth: '200px'
-          }}
-        >
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(5, 1fr)', 
-            gap: '4px',
-            marginBottom: '8px'
-          }}>
+        <div className="color-dropdown">
+          <div className="color-grid">
             {COLORS.map((color, index) => (
               <ColorSwatch
                 key={index}
@@ -167,21 +123,13 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
 
           <button
             onClick={() => setIsCustomMode(!isCustomMode)}
-            style={{
-              width: '100%',
-              padding: '4px',
-              marginTop: '4px',
-              backgroundColor: isCustomMode ? '#e0e0e0' : 'white',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
+            className={`custom-color-button ${isCustomMode ? 'active' : ''}`}
           >
             Custom Color
           </button>
 
           {isCustomMode && (
-            <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="color-slider-container">
               <ColorSlider color={customColor} channel="r" onChange={handleCustomColorChange} />
               <ColorSlider color={customColor} channel="g" onChange={handleCustomColorChange} />
               <ColorSlider color={customColor} channel="b" onChange={handleCustomColorChange} />
@@ -191,15 +139,9 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
                   onColorChange(customColor);
                   setIsOpen(false);
                 }}
+                className="custom-color-preview"
                 style={{
-                  width: '100%',
-                  height: '32px',
-                  marginTop: '4px',
-                  backgroundColor: `rgba(${customColor.r}, ${customColor.g}, ${customColor.b}, ${customColor.a / 255})`,
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  padding: 0
+                  backgroundColor: `rgba(${customColor.r}, ${customColor.g}, ${customColor.b}, ${customColor.a / 255})`
                 }}
               />
             </div>
@@ -212,5 +154,4 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
 
 ColorSelectComponent.displayName = 'ColorSelect';
 
-// Memoize and export the component
 export const ColorSelect = memo(ColorSelectComponent);

@@ -247,13 +247,7 @@ export const PrintButton: React.FC<PrintButtonProps> = ({ project, gridRef }) =>
   return (
     <button
       onClick={handlePrint}
-      style={{
-        padding: '4px 12px',
-        borderRadius: '4px',
-        border: '1px solid #ccc',
-        backgroundColor: 'white',
-        cursor: 'pointer'
-      }}
+      className="toolbar-button"
     >
       Print
     </button>

@@ -2,6 +2,7 @@ import React, { memo, useCallback, useState, useRef, useEffect } from 'react';
 import { StitchType, Orientation } from '../types';
 import { ORIENTATION_OPTIONS } from '../constants';
 import { StitchSVG } from './StitchSVG';
+import './OrientationSelect.css';
 
 interface OrientationSelectProps {
   selectedStitch: StitchType;
@@ -20,19 +21,7 @@ const SelectButton = memo(({
 }) => (
   <button
     onClick={onClick}
-    style={{
-      width: '32px',
-      height: '32px',
-      padding: 0,
-      border: '1px solid #ccc',
-      borderRadius: '4px',
-      backgroundColor: 'white',
-      cursor: 'pointer',
-      position: 'relative',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}
+    className="orientation-button"
   >
     <StitchSVG
       type={selectedStitch}
@@ -83,7 +72,7 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
   }
 
   return (
-    <div ref={containerRef} style={{ position: 'relative' }}>
+    <div ref={containerRef} className="orientation-container">
       <SelectButton
         selectedStitch={selectedStitch}
         selectedOrientation={selectedOrientation}
@@ -91,40 +80,12 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
       />
       
       {isOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            marginTop: '4px',
-            backgroundColor: 'white',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            padding: '4px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '4px',
-            zIndex: 1000,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-          }}
-        >
+        <div className="orientation-dropdown">
           {orientations.map((orientation) => (
             <button
               key={orientation}
               onClick={() => handleOptionClick(orientation)}
-              style={{
-                width: '32px',
-                height: '32px',
-                padding: 0,
-                border: orientation === selectedOrientation ? '2px solid #007bff' : '1px solid #ccc',
-                borderRadius: '4px',
-                backgroundColor: 'white',
-                cursor: 'pointer',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+              className={`orientation-option ${orientation === selectedOrientation ? 'selected' : ''}`}
             >
               <StitchSVG
                 type={selectedStitch}
