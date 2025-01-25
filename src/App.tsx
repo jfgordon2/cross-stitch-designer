@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { Grid } from './components/Grid';
 import { Toolbar } from './components/Toolbar';
-import { Color, Project, Stitch, StitchType } from './types';
+import { Color, Project, Stitch, StitchType, AppMode, BackgroundImage } from './types';
 import { COLORS, GRID_CONSTANTS } from './constants';
 import {
   createNewProject,
@@ -53,6 +53,7 @@ function App() {
   const [selectedOrientation, setSelectedOrientation] = useState<string>("0");
   const [width, setWidth] = useState(GRID_CONSTANTS.defaultGridSize.toString());
   const [height, setHeight] = useState(GRID_CONSTANTS.defaultGridSize.toString());
+  const [mode, setMode] = useState<AppMode>('edit');
   const gridRef = useRef<HTMLDivElement>(null);
 
   const handleCustomColorAdd = useCallback((color: Color) => {
@@ -130,6 +131,13 @@ function App() {
     }
   }, []);
 
+  const handleBackgroundChange = useCallback((background: BackgroundImage | undefined) => {
+    setProject(currentProject => ({
+      ...currentProject,
+      background
+    }));
+  }, []);
+
   return (
     <ErrorBoundary>
       <div className="app">
@@ -151,19 +159,20 @@ function App() {
           onResize={handleResize}
           onSave={handleSave}
           onLoad={handleLoad}
+          onBackgroundChange={handleBackgroundChange}
+          onModeChange={setMode}
         />
         <div className="grid-container">
-          <ErrorBoundary>
-            <Grid
-              ref={gridRef}
-              project={project}
-              selectedColor={selectedColor}
-              selectedStitch={selectedStitch}
-              selectedOrientation={selectedOrientation}
-              cellSize={GRID_CONSTANTS.defaultCellSize}
-              onCellUpdate={handleCellUpdate}
-            />
-          </ErrorBoundary>
+          <Grid
+            ref={gridRef}
+            project={project}
+            selectedColor={selectedColor}
+            selectedStitch={selectedStitch}
+            selectedOrientation={selectedOrientation}
+            cellSize={GRID_CONSTANTS.defaultCellSize}
+            mode={mode}
+            onCellUpdate={handleCellUpdate}
+          />
         </div>
       </div>
     </ErrorBoundary>

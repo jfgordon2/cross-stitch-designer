@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
-import { Color, Project, StitchType } from '../types';
+import { Color, Project, StitchType, GridRef, AppMode, BackgroundImage } from '../types';
 import { ORIENTATION_OPTIONS } from '../constants';
 import { OrientationSelect } from './OrientationSelect';
 import { ColorSelect } from './ColorSelect';
 import { PrintButton } from './PrintButton';
+import { BackgroundEditor } from './BackgroundEditor';
 import './Toolbar.css';
 
 interface ToolbarProps {
@@ -14,7 +15,7 @@ interface ToolbarProps {
   width: string;
   height: string;
   project: Project;
-  gridRef: React.RefObject<HTMLDivElement>;
+  gridRef: GridRef;
   onStitchChange: (stitch: StitchType) => void;
   onOrientationChange: (orientation: string) => void;
   onColorChange: (color: Color) => void;
@@ -24,6 +25,8 @@ interface ToolbarProps {
   onResize: () => void;
   onSave: () => void;
   onLoad: () => void;
+  onBackgroundChange: (background: BackgroundImage | undefined) => void;
+  onModeChange: (mode: AppMode) => void;
 }
 
 export const Toolbar = React.memo<ToolbarProps>(({
@@ -44,6 +47,8 @@ export const Toolbar = React.memo<ToolbarProps>(({
   onResize,
   onSave,
   onLoad,
+  onBackgroundChange,
+  onModeChange,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -152,6 +157,16 @@ export const Toolbar = React.memo<ToolbarProps>(({
           >
             Resize Grid
           </button>
+        </div>
+
+        <div className="toolbar-group">
+          <BackgroundEditor
+            background={project.background}
+            canvasWidth={project.width * 30}
+            canvasHeight={project.height * 30}
+            onBackgroundChange={onBackgroundChange}
+            onModeChange={onModeChange}
+          />
         </div>
 
         <div className="toolbar-group">

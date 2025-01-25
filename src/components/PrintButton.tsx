@@ -1,9 +1,9 @@
 import React from 'react';
-import { Project } from '../types';
+import { Project, GridRef } from '../types';
 
 interface PrintButtonProps {
   project: Project;
-  gridRef: React.RefObject<HTMLDivElement>;
+  gridRef: GridRef;
 }
 
 export const PrintButton: React.FC<PrintButtonProps> = ({ project, gridRef }) => {
@@ -16,7 +16,7 @@ export const PrintButton: React.FC<PrintButtonProps> = ({ project, gridRef }) =>
 
     // Create a new window for printing
     const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    if (!printWindow || !gridRef.current) return;
 
     // Get necessary styles by filtering stylesheets
     const styleSheets = Array.from(document.styleSheets);
@@ -39,8 +39,7 @@ export const PrintButton: React.FC<PrintButtonProps> = ({ project, gridRef }) =>
       .join('\n');
 
     // Get the grid content
-    const gridContent = gridRef.current?.cloneNode(true) as HTMLElement;
-    if (!gridContent) return;
+    const gridContent = gridRef.current.cloneNode(true) as HTMLElement;
 
     // Determine if we need to rotate (width > height)
     const needsRotation = project.width > project.height;

@@ -11,11 +11,19 @@
     height: auto !important;
     display: block !important;
     width: 100% !important;
+    background-color: white !important;
+  }
+
+  /* Reset wrapper padding for print */
+  .grid-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
   }
 
   /* Print container with padding */
   .print-container {
-    padding: 2mm !important;
+    padding: 0 !important;
     box-sizing: content-box !important;
     margin: 0 auto !important;
   }
@@ -27,7 +35,9 @@
     page-break-inside: avoid !important;
     display: block !important;
     position: relative !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
   }
 
   /* Grid cells container */
@@ -83,6 +93,7 @@
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
+    background-color: white !important;
   }
 
   /* Force border colors and transforms to print */
@@ -103,8 +114,8 @@
     }
   }
 
-  /* Ensure page breaks don't occur within grid */
-  .print-grid {
-    page-break-inside: avoid !important;
+  /* Remove canvas border in print */
+  canvas {
+    border: none !important;
   }
 }

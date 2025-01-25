@@ -1,4 +1,5 @@
 import { ORIENTATION_OPTIONS } from './constants';
+import { MutableRefObject } from 'react';
 
 export interface Color {
     r: number;
@@ -15,6 +16,20 @@ export const createColor = (r: number, g: number, b: number, a: number): Color =
     }
     return { r, g, b, a };
 };
+
+// Background image configuration
+export interface BackgroundImage {
+    dataUrl: string;     // Base64 encoded image data
+    opacity: number;     // 0 to 1
+    position: {
+        x: number;       // Offset from left in pixels
+        y: number;       // Offset from top in pixels
+    };
+    scale: number;       // Scale factor (1 = original size)
+}
+
+// App modes
+export type AppMode = 'edit' | 'background';
 
 // Stitch types as union type from orientation options
 export type StitchType = keyof typeof ORIENTATION_OPTIONS;
@@ -34,13 +49,18 @@ export interface Project {
     width: number;
     height: number;
     grid: Cell[][];
+    background?: BackgroundImage;
 }
 
 export interface UIState {
     selectedColor: Color;
     selectedStitch: StitchType;
     selectedOrientation: string;  // Kept as string for form handling
+    mode: AppMode;
 }
+
+// Grid ref type for consistency across components
+export type GridRef = MutableRefObject<HTMLDivElement | null>;
 
 // Type guard for Color validation
 export const isValidColor = (color: unknown): color is Color => {
@@ -70,6 +90,24 @@ export const isValidStitch = (stitch: unknown): stitch is Stitch => {
         s.orientation >= 0 &&
         s.orientation <= 3 &&
         Object.keys(ORIENTATION_OPTIONS).includes(s.stitchType)
+    );
+};
+
+// Type guard for BackgroundImage validation
+export const isValidBackgroundImage = (bg: unknown): bg is BackgroundImage => {
+    if (typeof bg !== 'object' || bg === null) return false;
+
+    const b = bg as BackgroundImage;
+    return (
+        typeof b.dataUrl === 'string' &&
+        typeof b.opacity === 'number' &&
+        b.opacity >= 0 &&
+        b.opacity <= 1 &&
+        typeof b.position === 'object' &&
+        typeof b.position.x === 'number' &&
+        typeof b.position.y === 'number' &&
+        typeof b.scale === 'number' &&
+        b.scale > 0
     );
 };
 

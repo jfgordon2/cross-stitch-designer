@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, forwardRef, useCallback, useMemo } from 'react';
-import { Color, Project, Stitch, StitchType, Orientation } from '../types';
+import { Color, Project, Stitch, StitchType, Orientation, AppMode } from '../types';
 import { StitchSVG } from './StitchSVG';
 
 interface GridProps {
@@ -8,6 +8,7 @@ interface GridProps {
   selectedStitch: StitchType;
   selectedOrientation: string;
   cellSize: number;
+  mode: AppMode;
   onCellUpdate: (row: number, col: number, stitch: Stitch) => void;
 }
 
@@ -28,19 +29,54 @@ const createStitch = (
   };
 };
 
-export const Grid = forwardRef<HTMLDivElement, GridProps>(({
-  project,
-  selectedColor,
-  selectedStitch,
-  selectedOrientation,
-  cellSize,
-  onCellUpdate,
-}, ref) => {
+export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
+  const {
+    project,
+    selectedColor,
+    selectedStitch,
+    selectedOrientation,
+    cellSize,
+    mode,
+    onCellUpdate,
+  } = props;
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const backgroundRef = useRef<HTMLCanvasElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [lastCell, setLastCell] = useState<{ row: number; col: number } | null>(null);
 
-  // Memoize grid drawing function
+  // Draw background image
+  const drawBackground = useCallback(() => {
+    const canvas = backgroundRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Always clear the canvas first
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Only draw if there's a background image
+    if (project.background) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.globalAlpha = project.background!.opacity;
+        const { x, y } = project.background!.position;
+        const scale = project.background!.scale;
+        
+        ctx.drawImage(
+          img,
+          x,
+          y,
+          img.width * scale,
+          img.height * scale
+        );
+      };
+      img.src = project.background.dataUrl;
+    }
+  }, [project.background]);
+
+  // Draw grid lines
   const drawGrid = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -51,14 +87,9 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(({
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw cells background and borders
+    // Only draw grid lines, no background fill
     for (let row = 0; row < project.height; row++) {
       for (let col = 0; col < project.width; col++) {
-        // Draw cell background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
-        
-        // Draw cell border with lighter color
         ctx.strokeStyle = '#e0e0e0';
         ctx.lineWidth = 1;
         ctx.strokeRect(col * cellSize, row * cellSize, cellSize, cellSize);
@@ -68,7 +99,8 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(({
 
   useEffect(() => {
     drawGrid();
-  }, [drawGrid]);
+    drawBackground();
+  }, [drawGrid, drawBackground]);
 
   const getCellFromPosition = useCallback((x: number, y: number): { row: number; col: number } | null => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -88,32 +120,62 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(({
   }, [project.height, project.width, cellSize]);
 
   const updateCell = useCallback((row: number, col: number) => {
+    if (mode !== 'edit') return; // Only allow editing in edit mode
+    
     try {
-      const newStitch = createStitch(selectedColor, selectedStitch, selectedOrientation);
-      onCellUpdate(row, col, newStitch);
+      const currentStitches = project.grid[row][col].stitches;
+      const existingStitchIndex = currentStitches.findIndex(
+        stitch => stitch.stitchType === selectedStitch
+      );
+
+      let newStitch: Stitch | null = null;
+      if (existingStitchIndex >= 0) {
+        // If stitch type exists, toggle orientation or remove if same orientation
+        const existingStitch = currentStitches[existingStitchIndex];
+        const newOrientation = parseInt(selectedOrientation, 10) as Orientation;
+        
+        if (existingStitch.orientation === newOrientation) {
+          // Remove stitch if same orientation
+          newStitch = null;
+        } else {
+          // Update orientation if different
+          newStitch = {
+            stitchType: selectedStitch,
+            orientation: newOrientation,
+            color: selectedColor
+          };
+        }
+      } else {
+        // Add new stitch if type doesn't exist
+        newStitch = createStitch(selectedColor, selectedStitch, selectedOrientation);
+      }
+
+      onCellUpdate(row, col, newStitch || { stitchType: selectedStitch, orientation: 0 as Orientation, color: selectedColor });
     } catch (error) {
       console.error('Failed to update cell:', error);
     }
-  }, [selectedColor, selectedStitch, selectedOrientation, onCellUpdate]);
+  }, [mode, project.grid, selectedColor, selectedStitch, selectedOrientation, onCellUpdate]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (mode !== 'edit') return; // Only allow editing in edit mode
+
     const cell = getCellFromPosition(e.clientX, e.clientY);
     if (cell) {
       setIsDragging(true);
       setLastCell(cell);
       updateCell(cell.row, cell.col);
     }
-  }, [getCellFromPosition, updateCell]);
+  }, [mode, getCellFromPosition, updateCell]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDragging) return;
+    if (!isDragging || mode !== 'edit') return;
 
     const cell = getCellFromPosition(e.clientX, e.clientY);
     if (cell && (cell.row !== lastCell?.row || cell.col !== lastCell?.col)) {
       setLastCell(cell);
       updateCell(cell.row, cell.col);
     }
-  }, [isDragging, lastCell, getCellFromPosition, updateCell]);
+  }, [mode, isDragging, lastCell, getCellFromPosition, updateCell]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -148,35 +210,64 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(({
     )
   ), [project.grid, cellSize]);
 
+  const width = project.width * cellSize;
+  const height = project.height * cellSize;
+
   return (
-    <div 
-      ref={ref} 
-      style={{ position: 'relative' }}
-      className="grid-section"
-    >
-      <canvas
-        ref={canvasRef}
-        width={project.width * cellSize}
-        height={project.height * cellSize}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        style={{
-          border: '1px solid #ccc',
-          cursor: 'crosshair',
-        }}
-      />
+    <div ref={ref} className="grid-wrapper">
       <div
-        className="grid-overlay"
+        className="grid-section"
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          pointerEvents: 'none',
+          width: `${width}px`,
+          height: `${height}px`
         }}
       >
-        {gridOverlay}
+        {/* Background layer */}
+        <canvas
+          ref={backgroundRef}
+          width={project.width * cellSize}
+          height={project.height * cellSize}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 0,
+            pointerEvents: 'none',
+          }}
+        />
+        
+        {/* Grid layer */}
+        <canvas
+          ref={canvasRef}
+          width={project.width * cellSize}
+          height={project.height * cellSize}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 2,
+            border: '1px solid #ccc',
+            cursor: mode === 'edit' ? 'crosshair' : 'default',
+          }}
+        />
+
+        {/* Stitches overlay layer */}
+        <div
+          className="grid-overlay"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 3,
+            pointerEvents: 'none',
+          }}
+        >
+          {gridOverlay}
+        </div>
       </div>
     </div>
   );
