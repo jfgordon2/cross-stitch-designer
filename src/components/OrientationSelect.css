@@ -16,6 +16,11 @@
   justify-content: center;
 }
 
+.orientation-button svg {
+  width: 28px;
+  height: 28px;
+}
+
 .orientation-dropdown {
   position: absolute;
   top: 100%;
@@ -45,6 +50,11 @@
   justify-content: center;
 }
 
+.orientation-option svg {
+  width: 28px;
+  height: 28px;
+}
+
 .orientation-option.selected {
   border: 2px solid #007bff;
 }
@@ -58,6 +68,12 @@
   .orientation-option {
     width: 40px;
     height: 40px;
+  }
+
+  .orientation-button svg,
+  .orientation-option svg {
+    width: 36px;
+    height: 36px;
   }
 
   .orientation-dropdown {

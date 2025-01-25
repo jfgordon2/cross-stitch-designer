@@ -13,10 +13,12 @@ interface OrientationSelectProps {
 const SelectButton = memo(({ 
   selectedStitch, 
   selectedOrientation, 
+  size,
   onClick 
 }: { 
   selectedStitch: StitchType; 
   selectedOrientation: string;
+  size: number;
   onClick: () => void;
 }) => (
   <button
@@ -27,7 +29,7 @@ const SelectButton = memo(({
       type={selectedStitch}
       orientation={parseInt(selectedOrientation, 10) as Orientation}
       color={{ r: 0, g: 0, b: 0, a: 255 }}
-      size={28}
+      size={size}
     />
   </button>
 ));
@@ -40,7 +42,18 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
   onOrientationChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateMobileState = () => {
+      setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    };
+
+    updateMobileState();
+    window.addEventListener('resize', updateMobileState);
+    return () => window.removeEventListener('resize', updateMobileState);
+  }, []);
 
   const handleOptionClick = useCallback((orientation: string) => {
     onOrientationChange(orientation);
@@ -59,6 +72,7 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
   }, []);
 
   const orientations = ORIENTATION_OPTIONS[selectedStitch];
+  const stitchSize = isMobile ? 36 : 28;
 
   // If there's only one orientation, just show it without dropdown functionality
   if (orientations.length === 1) {
@@ -66,6 +80,7 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
       <SelectButton
         selectedStitch={selectedStitch}
         selectedOrientation={orientations[0]}
+        size={stitchSize}
         onClick={() => {}}
       />
     );
@@ -76,6 +91,7 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
       <SelectButton
         selectedStitch={selectedStitch}
         selectedOrientation={selectedOrientation}
+        size={stitchSize}
         onClick={() => setIsOpen(!isOpen)}
       />
       
@@ -91,7 +107,7 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
                 type={selectedStitch}
                 orientation={parseInt(orientation, 10) as Orientation}
                 color={{ r: 0, g: 0, b: 0, a: 255 }}
-                size={28}
+                size={stitchSize}
               />
             </button>
           ))}
