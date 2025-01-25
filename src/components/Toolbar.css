@@ -42,6 +42,23 @@
   }
 }
 
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-label {
+  position: absolute;
+  top: -14px;
+  left: 0;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #666;
+  margin: 0;
+  line-height: 1;
+}
+
 .toolbar-input {
   width: 60px;
   padding: 4px;
@@ -54,6 +71,20 @@
   border-radius: 4px;
   border: 1px solid #ccc;
   min-width: 80px;
+  margin-top: 14px;  /* offset the absolute label */
+}
+
+/* Adjust the input-group to work with select boxes too */
+.input-group .toolbar-select {
+  margin-top: 0;
+  width: 100%;
+}
+
+/* Common spacing for all form controls */
+.toolbar-select,
+.toolbar-input {
+  height: 28px;
+  box-sizing: border-box;
 }
 
 .toolbar-button {
@@ -119,15 +150,40 @@
     display: flex;
   }
 
-  .toolbar-input, 
-  .toolbar-select, 
+  .toolbar-input,
+  .toolbar-select,
   .toolbar-button {
     flex: 1;
     min-height: 40px;
   }
 
+  .input-group {
+    flex: 1;
+  }
+
+  .input-group .toolbar-input {
+    width: 100%;
+  }
+
   .toolbar-group {
     flex-wrap: wrap;
+  }
+
+  .toolbar-group.mobile-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+    padding-top: 8px;
+  }
+
+  /* Special case for width/height/resize group */
+  .toolbar-group.mobile-row.size-controls {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .toolbar-group.mobile-row .input-group {
+    width: 100%;
   }
 
   .toolbar-group.toolbar-actions {

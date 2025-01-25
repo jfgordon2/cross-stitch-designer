@@ -105,65 +105,73 @@ export const Toolbar = React.memo<ToolbarProps>(({
       </button>
 
       <div ref={toolbarRef} className={`toolbar ${isCollapsed ? 'collapsed' : ''}`}>
-        <div className="toolbar-group">
-          <label>Stitch:</label>
-          <select 
-            value={selectedStitch}
-            onChange={handleStitchChange}
-            className="toolbar-select"
-          >
-            {stitchTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
+        <div className="toolbar-group mobile-row">
+          <div className="input-group">
+            <label className="input-label">STITCH</label>
+            <select
+              value={selectedStitch}
+              onChange={handleStitchChange}
+              className="toolbar-select"
+            >
+              {stitchTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="toolbar-group">
-          <label>Orientation:</label>
-          <OrientationSelect
-            selectedStitch={selectedStitch}
-            selectedOrientation={selectedOrientation}
-            onOrientationChange={onOrientationChange}
-          />
+        <div className="toolbar-group has-separator mobile-row">
+          <div className="input-group">
+            <label className="input-label">ORIENT</label>
+            <OrientationSelect
+              selectedStitch={selectedStitch}
+              selectedOrientation={selectedOrientation}
+              onOrientationChange={onOrientationChange}
+            />
+          </div>
+
+          <div className="input-group">
+            <label className="input-label">COLOR</label>
+            <ColorSelect
+              selectedColor={selectedColor}
+              customColors={customColors}
+              onColorChange={onColorChange}
+              onCustomColorAdd={onCustomColorAdd}
+            />
+          </div>
         </div>
 
-        <div className="toolbar-group has-separator">
-          <label>Color:</label>
-          <ColorSelect
-            selectedColor={selectedColor}
-            customColors={customColors}
-            onColorChange={onColorChange}
-            onCustomColorAdd={onCustomColorAdd}
-          />
-        </div>
-
-        <div className="toolbar-group has-separator">
-          <label>Width:</label>
-          <input
-            type="number"
-            min="1"
-            value={width}
-            onChange={handleWidthChange}
-            className="toolbar-input"
-          />
-          <label>Height:</label>
-          <input
-            type="number"
-            min="1"
-            value={height}
-            onChange={handleHeightChange}
-            className="toolbar-input"
-          />
+        <div className="toolbar-group has-separator mobile-row size-controls">
+          <div className="input-group">
+            <label className="input-label">WIDTH</label>
+            <input
+              type="number"
+              min="1"
+              value={width}
+              onChange={handleWidthChange}
+              className="toolbar-input"
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">HEIGHT</label>
+            <input
+              type="number"
+              min="1"
+              value={height}
+              onChange={handleHeightChange}
+              className="toolbar-input"
+            />
+          </div>
           <button
             onClick={onResize}
             className="toolbar-button"
             title="Resize Grid"
           >
-            <img src={gridIcon} alt="Resize Grid" />
+            RESIZE
           </button>
         </div>
 
-        <div className="toolbar-group toolbar-actions">
+        <div className="toolbar-group toolbar-actions mobile-row">
           <BackgroundEditor
             background={project.background}
             canvasWidth={project.width * 30}
