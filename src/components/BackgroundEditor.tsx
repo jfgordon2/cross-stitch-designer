@@ -32,11 +32,15 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
   }, []);
 
   const handleStartEditing = useCallback(() => {
-    if (buttonRef.current) {
-      setButtonRect(buttonRef.current.getBoundingClientRect());
+    if (isEditing) {
+      setIsEditing(false);
+    } else {
+      if (buttonRef.current) {
+        setButtonRect(buttonRef.current.getBoundingClientRect());
+      }
+      setIsEditing(true);
     }
-    setIsEditing(true);
-  }, []);
+  }, [isEditing]);
 
   useEffect(() => {
     if (isEditing) {
