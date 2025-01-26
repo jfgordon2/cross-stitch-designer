@@ -1,5 +1,5 @@
 import { ORIENTATION_OPTIONS } from './constants';
-import { MutableRefObject } from 'react';
+import { RefObject } from 'react';
 
 export interface Color {
     r: number;
@@ -55,12 +55,13 @@ export interface Project {
 export interface UIState {
     selectedColor: Color;
     selectedStitch: StitchType;
-    selectedOrientation: string;  // Kept as string for form handling
+    selectedOrientation: Orientation;
     mode: AppMode;
 }
 
 // Grid ref type for consistency across components
-export type GridRef = MutableRefObject<HTMLDivElement | null>;
+// Note: RefObject<T> already includes null in its type definition
+export type GridRef = RefObject<HTMLDivElement>;
 
 // Type guard for Color validation
 export const isValidColor = (color: unknown): color is Color => {

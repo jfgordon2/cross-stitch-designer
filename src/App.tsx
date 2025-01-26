@@ -2,7 +2,6 @@ import { useState, useCallback, useRef } from 'react';
 import { Grid } from './components/Grid';
 import { Toolbar } from './components/Toolbar';
 import { Color, Project, Stitch, StitchType, AppMode, BackgroundImage } from './types';
-import eraserIcon from './assets/eraser.svg';
 import { COLORS, GRID_CONSTANTS } from './constants';
 import {
   createNewProject,

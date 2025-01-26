@@ -7,7 +7,6 @@ import { PrintButton } from './PrintButton';
 import { BackgroundEditor } from './BackgroundEditor';
 import downloadIcon from '../assets/file-download-outline.svg';
 import uploadIcon from '../assets/file-upload-outline.svg';
-import gridIcon from '../assets/view-grid-plus-outline.svg';
 import eraserIcon from '../assets/eraser.svg';
 import './Toolbar.css';
 
