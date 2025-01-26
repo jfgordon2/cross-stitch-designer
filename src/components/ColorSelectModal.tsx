@@ -1,7 +1,8 @@
-import React, { memo, useEffect, useState, CSSProperties } from 'react';
+import React, { memo, useState, useEffect, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { Color } from '../types';
 import { COLORS } from '../constants';
+import { getModalStyle } from '../utils/modalUtils';
 import './ColorSelect.css';
 
 interface ColorSelectModalProps {
@@ -100,39 +101,17 @@ export const ColorSelectModal: React.FC<ColorSelectModalProps> = ({
   const isColorEqual = (a: Color, b: Color) =>
     a.r === b.r && a.g === b.g && a.b === b.b && a.a === b.a;
 
-  const getModalStyle = (): CSSProperties => {
-    const baseStyle: CSSProperties = {
-      position: 'fixed',
-      zIndex: 9999,
-      pointerEvents: 'auto',
-      backgroundColor: 'white',
-      padding: '20px',
-      borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
-    };
-
-    if (isMobile) {
-      return {
-        ...baseStyle,
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)'
-      };
-    }
-
-    if (!buttonRect) return baseStyle;
-
-    return {
-      ...baseStyle,
-      top: buttonRect.bottom + window.scrollY + 4,
-      left: buttonRect.left + window.scrollX
-    };
+  const baseStyle: CSSProperties = {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
   };
 
   const modal = (
-    <div 
+    <div
       className="color-dropdown"
-      style={getModalStyle()}
+      style={getModalStyle(isMobile, buttonRect, baseStyle)}
     >
       <div className="color-grid">
         {[...COLORS, ...customColors].map((color, index) => (

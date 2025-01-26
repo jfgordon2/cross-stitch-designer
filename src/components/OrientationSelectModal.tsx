@@ -2,6 +2,7 @@ import React, { useState, useEffect, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { StitchType, Orientation } from '../types';
 import { StitchSVG } from './StitchSVG';
+import { getModalStyle } from '../utils/modalUtils';
 import './OrientationSelect.css';
 
 interface OrientationSelectModalProps {
@@ -34,39 +35,17 @@ export const OrientationSelectModal: React.FC<OrientationSelectModalProps> = ({
     return () => mediaQuery.removeEventListener('change', updateIsMobile);
   }, []);
 
-  const getModalStyle = (): CSSProperties => {
-    const baseStyle: CSSProperties = {
-      position: 'fixed',
-      zIndex: 9999,
-      pointerEvents: 'auto',
-      backgroundColor: 'white',
-      padding: '20px',
-      borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
-    };
-
-    if (isMobile) {
-      return {
-        ...baseStyle,
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)'
-      };
-    }
-
-    if (!buttonRect) return baseStyle;
-
-    return {
-      ...baseStyle,
-      top: buttonRect.bottom + window.scrollY + 4,
-      left: buttonRect.left + window.scrollX
-    };
+  const baseStyle: CSSProperties = {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
   };
 
   const modal = (
     <div 
       className="orientation-dropdown"
-      style={getModalStyle()}
+      style={getModalStyle(isMobile, buttonRect, baseStyle)}
     >
       {orientations.map((orientation) => (
         <button
