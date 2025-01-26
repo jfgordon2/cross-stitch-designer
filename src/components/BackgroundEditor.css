@@ -48,6 +48,15 @@
 .direction-buttons button {
   padding: 8px;
   min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.direction-buttons button img {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 .background-buttons {
@@ -97,9 +106,11 @@
 
   .direction-buttons button {
     min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  }
+
+  .direction-buttons button img {
+    width: 28px;
+    height: 28px;
   }
 
   /* Action buttons for mobile */

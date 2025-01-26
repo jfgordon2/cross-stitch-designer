@@ -1,6 +1,10 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { BackgroundImage } from '../types';
+import arrowLeftIcon from '../assets/arrow-left-circle-outline.svg';
+import arrowRightIcon from '../assets/arrow-right-circle-outline.svg';
+import arrowUpIcon from '../assets/arrow-up-circle-outline.svg';
+import arrowDownIcon from '../assets/arrow-down-circle-outline.svg';
 import './BackgroundEditor.css';
 
 interface BackgroundEditorModalProps {
@@ -93,10 +97,30 @@ export const BackgroundEditorModal: React.FC<BackgroundEditorModalProps> = ({
         <div className="position-controls">
           <label>Position:</label>
           <div className="direction-buttons">
-            <button onClick={() => onPositionChange(-10, 0)}>←</button>
-            <button onClick={() => onPositionChange(0, -10)}>↑</button>
-            <button onClick={() => onPositionChange(0, 10)}>↓</button>
-            <button onClick={() => onPositionChange(10, 0)}>→</button>
+            <button 
+              onClick={() => onPositionChange(-10, 0)}
+              className="toolbar-button"
+            >
+              <img src={arrowLeftIcon} alt="Move left" />
+            </button>
+            <button 
+              onClick={() => onPositionChange(0, -10)}
+              className="toolbar-button"
+            >
+              <img src={arrowUpIcon} alt="Move up" />
+            </button>
+            <button 
+              onClick={() => onPositionChange(0, 10)}
+              className="toolbar-button"
+            >
+              <img src={arrowDownIcon} alt="Move down" />
+            </button>
+            <button 
+              onClick={() => onPositionChange(10, 0)}
+              className="toolbar-button"
+            >
+              <img src={arrowRightIcon} alt="Move right" />
+            </button>
           </div>
         </div>
       </div>
