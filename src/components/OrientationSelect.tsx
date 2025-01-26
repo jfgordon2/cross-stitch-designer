@@ -1,7 +1,8 @@
-import React, { memo, useCallback, useState, useRef, useEffect } from 'react';
+import React, { memo, useCallback, useState, useEffect } from 'react';
 import { StitchType, Orientation } from '../types';
 import { ORIENTATION_OPTIONS } from '../constants';
 import { StitchSVG } from './StitchSVG';
+import { OrientationSelectModal } from './OrientationSelectModal';
 import './OrientationSelect.css';
 
 interface OrientationSelectProps {
@@ -43,7 +44,6 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateMobileState = () => {
@@ -59,17 +59,6 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
     onOrientationChange(orientation);
     setIsOpen(false);
   }, [onOrientationChange]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const orientations = ORIENTATION_OPTIONS[selectedStitch];
   const stitchSize = isMobile ? 36 : 28;
@@ -87,7 +76,7 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
   }
 
   return (
-    <div ref={containerRef} className="orientation-container">
+    <div className="orientation-container">
       <SelectButton
         selectedStitch={selectedStitch}
         selectedOrientation={selectedOrientation}
@@ -96,22 +85,13 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
       />
       
       {isOpen && (
-        <div className="orientation-dropdown">
-          {orientations.map((orientation) => (
-            <button
-              key={orientation}
-              onClick={() => handleOptionClick(orientation)}
-              className={`orientation-option ${orientation === selectedOrientation ? 'selected' : ''}`}
-            >
-              <StitchSVG
-                type={selectedStitch}
-                orientation={parseInt(orientation, 10) as Orientation}
-                color={{ r: 0, g: 0, b: 0, a: 255 }}
-                size={stitchSize}
-              />
-            </button>
-          ))}
-        </div>
+        <OrientationSelectModal
+          selectedStitch={selectedStitch}
+          selectedOrientation={selectedOrientation}
+          orientations={orientations}
+          stitchSize={stitchSize}
+          onOptionClick={handleOptionClick}
+        />
       )}
     </div>
   );

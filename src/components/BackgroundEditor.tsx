@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { BackgroundImage, AppMode } from '../types';
+import { BackgroundEditorModal } from './BackgroundEditorModal';
 import './BackgroundEditor.css';
 import imageIcon from '../assets/image.svg';
 import imageEditIcon from '../assets/image-edit.svg';
@@ -21,6 +22,7 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -112,6 +114,7 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
       />
       {!background ? (
         <button
+          ref={buttonRef}
           onClick={() => fileInputRef.current?.click()}
           className="toolbar-button"
           title="Add background"
@@ -120,6 +123,7 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
         </button>
       ) : (
         <button
+          ref={buttonRef}
           onClick={() => setIsEditing(true)}
           className="toolbar-button"
           title="Edit background"
@@ -129,48 +133,14 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
       )}
 
       {isEditing && background && (
-        <div className="background-editor-modal">
-          <div className="background-sliders">
-            <div className="background-slider-group">
-              <label>Opacity:</label>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={background.opacity}
-                onChange={handleOpacityChange}
-              />
-            </div>
-
-            <div className="background-slider-group">
-              <label>Scale:</label>
-              <input
-                type="range"
-                min="0.1"
-                max="2"
-                step="0.1"
-                value={background.scale}
-                onChange={handleScaleChange}
-              />
-            </div>
-
-            <div className="background-slider-group">
-              <label>Position:</label>
-              <div className="background-buttons">
-                <button onClick={() => handlePositionChange(0, -10)}>↑</button>
-                <button onClick={() => handlePositionChange(-10, 0)}>←</button>
-                <button onClick={() => handlePositionChange(10, 0)}>→</button>
-                <button onClick={() => handlePositionChange(0, 10)}>↓</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="background-buttons">
-            <button onClick={handleDone} className="toolbar-button">Done</button>
-            <button onClick={handleRemoveBackground} className="toolbar-button">Remove Background</button>
-          </div>
-        </div>
+        <BackgroundEditorModal
+          background={background}
+          onOpacityChange={handleOpacityChange}
+          onScaleChange={handleScaleChange}
+          onPositionChange={handlePositionChange}
+          onDone={handleDone}
+          onRemoveBackground={handleRemoveBackground}
+        />
       )}
     </div>
   );
