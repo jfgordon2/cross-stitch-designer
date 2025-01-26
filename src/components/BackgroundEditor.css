@@ -32,6 +32,24 @@
   flex: 1;
 }
 
+.position-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.direction-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.direction-buttons button {
+  padding: 8px;
+  min-width: 40px;
+}
+
 .background-buttons {
   display: flex;
   gap: 0.5rem;
@@ -68,12 +86,31 @@
     min-height: 40px;
   }
 
+  /* Position controls for mobile */
+  .position-controls label {
+    margin-bottom: 0.5rem;
+  }
+
+  .direction-buttons {
+    margin-bottom: 1rem;
+  }
+
+  .direction-buttons button {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Action buttons for mobile */
   .background-buttons {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
   }
 
   .background-buttons button {
-    width: 100%;
     min-height: 40px;
+    margin: 0;
   }
 }

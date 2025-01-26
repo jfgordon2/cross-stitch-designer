@@ -39,11 +39,7 @@ export const BackgroundEditorModal: React.FC<BackgroundEditorModalProps> = ({
     const baseStyle: CSSProperties = {
       position: 'fixed',
       zIndex: 9999,
-      pointerEvents: 'auto',
-      backgroundColor: 'white',
-      padding: '20px',
-      borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
+      pointerEvents: 'auto'
     };
 
     if (isMobile) {
@@ -94,13 +90,13 @@ export const BackgroundEditorModal: React.FC<BackgroundEditorModalProps> = ({
           />
         </div>
 
-        <div className="background-slider-group">
+        <div className="position-controls">
           <label>Position:</label>
-          <div className="background-buttons">
-            <button onClick={() => onPositionChange(0, -10)}>↑</button>
+          <div className="direction-buttons">
             <button onClick={() => onPositionChange(-10, 0)}>←</button>
-            <button onClick={() => onPositionChange(10, 0)}>→</button>
+            <button onClick={() => onPositionChange(0, -10)}>↑</button>
             <button onClick={() => onPositionChange(0, 10)}>↓</button>
+            <button onClick={() => onPositionChange(10, 0)}>→</button>
           </div>
         </div>
       </div>
