@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { Grid } from './components/Grid';
 import { Toolbar } from './components/Toolbar';
 import { Color, Project, Stitch, StitchType, AppMode, BackgroundImage } from './types';
+import eraserIcon from './assets/eraser.svg';
 import { COLORS, GRID_CONSTANTS } from './constants';
 import {
   createNewProject,
@@ -54,6 +55,7 @@ function App() {
   const [width, setWidth] = useState(GRID_CONSTANTS.defaultGridSize.toString());
   const [height, setHeight] = useState(GRID_CONSTANTS.defaultGridSize.toString());
   const [mode, setMode] = useState<AppMode>('edit');
+  const [isEraserMode, setIsEraserMode] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const handleCustomColorAdd = useCallback((color: Color) => {
@@ -74,6 +76,12 @@ function App() {
       };
       
       newProject.grid[row] = [...currentProject.grid[row]];
+      
+      if (isEraserMode) {
+        newProject.grid[row][col] = { stitches: [] };
+        return newProject;
+      }
+      
       newProject.grid[row][col] = {
         stitches: [...currentProject.grid[row][col].stitches]
       };
@@ -87,9 +95,11 @@ function App() {
       }
     });
 
-    // Add color to custom colors if it's not a default color
-    handleCustomColorAdd(selectedColor);
-  }, [selectedColor, handleCustomColorAdd]);
+    if (!isEraserMode) {
+      // Add color to custom colors if it's not a default color
+      handleCustomColorAdd(selectedColor);
+    }
+  }, [selectedColor, handleCustomColorAdd, isEraserMode]);
 
   const handleResize = useCallback(() => {
     const newWidth = parseInt(width, 10);
@@ -161,6 +171,8 @@ function App() {
           onLoad={handleLoad}
           onBackgroundChange={handleBackgroundChange}
           onModeChange={setMode}
+          isEraserMode={isEraserMode}
+          onEraserToggle={() => setIsEraserMode(!isEraserMode)}
         />
         <div className="grid-container">
           <Grid
@@ -171,6 +183,7 @@ function App() {
             selectedOrientation={selectedOrientation}
             cellSize={GRID_CONSTANTS.defaultCellSize}
             mode={mode}
+            isEraserMode={isEraserMode}
             onCellUpdate={handleCellUpdate}
           />
         </div>

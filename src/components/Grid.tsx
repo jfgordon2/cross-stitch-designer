@@ -9,6 +9,7 @@ interface GridProps {
   selectedOrientation: string;
   cellSize: number;
   mode: AppMode;
+  isEraserMode: boolean;
   onCellUpdate: (row: number, col: number, stitch: Stitch) => void;
 }
 
@@ -37,6 +38,7 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
     selectedOrientation,
     cellSize,
     mode,
+    isEraserMode,
     onCellUpdate,
   } = props;
 
@@ -122,6 +124,16 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
   const updateCell = useCallback((row: number, col: number) => {
     if (mode !== 'edit') return; // Only allow editing in edit mode
     
+    if (isEraserMode) {
+      // In eraser mode, just pass an empty stitch to clear the cell
+      onCellUpdate(row, col, {
+        color: { r: 0, g: 0, b: 0, a: 0 },
+        stitchType: 'Full',
+        orientation: 0
+      });
+      return;
+    }
+    
     try {
       // Create new stitch with current properties
       const newStitch = createStitch(selectedColor, selectedStitch, selectedOrientation);
@@ -131,7 +143,7 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
     } catch (error) {
       console.error('Failed to update cell:', error);
     }
-  }, [mode, project.grid, selectedColor, selectedStitch, selectedOrientation, onCellUpdate]);
+  }, [mode, isEraserMode, selectedColor, selectedStitch, selectedOrientation, onCellUpdate]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (mode !== 'edit') return; // Only allow editing in edit mode
@@ -229,7 +241,11 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>((props, ref) => {
             left: 0,
             zIndex: 1,
             border: '1px solid #ccc',
-            cursor: mode === 'edit' ? 'crosshair' : 'default',
+            cursor: mode === 'edit'
+              ? isEraserMode
+                ? 'url(data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="black"/><line x1="5" y1="10" x2="15" y2="10" stroke="black"/><line x1="10" y1="5" x2="10" y2="15" stroke="black"/></svg>) 10 10, auto'
+                : 'crosshair'
+              : 'default',
           }}
         />
 

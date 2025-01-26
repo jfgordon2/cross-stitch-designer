@@ -8,6 +8,7 @@ import { BackgroundEditor } from './BackgroundEditor';
 import downloadIcon from '../assets/file-download-outline.svg';
 import uploadIcon from '../assets/file-upload-outline.svg';
 import gridIcon from '../assets/view-grid-plus-outline.svg';
+import eraserIcon from '../assets/eraser.svg';
 import './Toolbar.css';
 
 interface ToolbarProps {
@@ -19,6 +20,7 @@ interface ToolbarProps {
   height: string;
   project: Project;
   gridRef: GridRef;
+  isEraserMode: boolean;
   onStitchChange: (stitch: StitchType) => void;
   onOrientationChange: (orientation: string) => void;
   onColorChange: (color: Color) => void;
@@ -30,29 +32,34 @@ interface ToolbarProps {
   onLoad: () => void;
   onBackgroundChange: (background: BackgroundImage | undefined) => void;
   onModeChange: (mode: AppMode) => void;
+  onEraserToggle: () => void;
 }
 
-export const Toolbar = React.memo<ToolbarProps>(({
-  selectedStitch,
-  selectedOrientation,
-  selectedColor,
-  customColors,
-  width,
-  height,
-  project,
-  gridRef,
-  onStitchChange,
-  onOrientationChange,
-  onColorChange,
-  onCustomColorAdd,
-  onWidthChange,
-  onHeightChange,
-  onResize,
-  onSave,
-  onLoad,
-  onBackgroundChange,
-  onModeChange,
-}) => {
+export const Toolbar = React.memo<ToolbarProps>((props) => {
+  const {
+    selectedStitch,
+    selectedOrientation,
+    selectedColor,
+    customColors,
+    width,
+    height,
+    project,
+    gridRef,
+    isEraserMode,
+    onStitchChange,
+    onOrientationChange,
+    onColorChange,
+    onCustomColorAdd,
+    onWidthChange,
+    onHeightChange,
+    onResize,
+    onSave,
+    onLoad,
+    onBackgroundChange,
+    onModeChange,
+    onEraserToggle,
+  } = props;
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
@@ -139,6 +146,17 @@ export const Toolbar = React.memo<ToolbarProps>(({
               onCustomColorAdd={onCustomColorAdd}
             />
           </div>
+
+          <div className="input-group">
+            <label className="input-label action-label">ERASE</label>
+            <button
+              onClick={onEraserToggle}
+              className={`toolbar-button ${isEraserMode ? 'active' : ''}`}
+              title={isEraserMode ? "Disable Eraser" : "Enable Eraser"}
+            >
+              <img src={eraserIcon} alt="Eraser Tool" />
+            </button>
+          </div>
         </div>
 
         <div className="toolbar-group has-separator mobile-row size-controls">
@@ -172,28 +190,40 @@ export const Toolbar = React.memo<ToolbarProps>(({
         </div>
 
         <div className="toolbar-group toolbar-actions mobile-row">
-          <BackgroundEditor
-            background={project.background}
-            canvasWidth={project.width * 30}
-            canvasHeight={project.height * 30}
-            onBackgroundChange={onBackgroundChange}
-            onModeChange={onModeChange}
-          />
-          <button
-            onClick={onSave}
-            className="toolbar-button"
-            title="Save Project to Local"
-          >
-            <img src={downloadIcon} alt="Save Project" />
-          </button>
-          <button
-            onClick={onLoad}
-            className="toolbar-button"
-            title="Upload Project from Local"
-          >
-            <img src={uploadIcon} alt="Upload Project" />
-          </button>
-          <PrintButton project={project} gridRef={gridRef} />
+          <div className="input-group">
+            <label className="input-label action-label">IMAGE</label>
+            <BackgroundEditor
+              background={project.background}
+              canvasWidth={project.width * 30}
+              canvasHeight={project.height * 30}
+              onBackgroundChange={onBackgroundChange}
+              onModeChange={onModeChange}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label action-label">SAVE</label>
+            <button
+              onClick={onSave}
+              className="toolbar-button"
+              title="Save Project to Local"
+            >
+              <img src={downloadIcon} alt="Save Project" />
+            </button>
+          </div>
+          <div className="input-group">
+            <label className="input-label action-label">UPLOAD</label>
+            <button
+              onClick={onLoad}
+              className="toolbar-button"
+              title="Upload Project from Local"
+            >
+              <img src={uploadIcon} alt="Upload Project" />
+            </button>
+          </div>
+          <div className="input-group">
+            <label className="input-label action-label">PRINT</label>
+            <PrintButton project={project} gridRef={gridRef} />
+          </div>
         </div>
       </div>
     </>
