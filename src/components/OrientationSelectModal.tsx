@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, CSSProperties } from 'react';
+import React, { useState, useEffect, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { StitchType, Orientation } from '../types';
 import { StitchSVG } from './StitchSVG';

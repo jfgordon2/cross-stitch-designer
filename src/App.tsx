@@ -10,7 +10,7 @@ import {
   loadProjectFromFile,
   resizeProject
 } from './utils/projectUtils';
-import ErrorBoundary from './components/ErrorBoundary.jsx';
+import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 import './print.css';
 

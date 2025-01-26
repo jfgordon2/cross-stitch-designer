@@ -60,8 +60,8 @@ export interface UIState {
 }
 
 // Grid ref type for consistency across components
-// Note: RefObject<T> already includes null in its type definition
-export type GridRef = RefObject<HTMLDivElement>;
+// Using RefObject with explicit null handling for React refs
+export type GridRef = RefObject<HTMLDivElement | null>;
 
 // Type guard for Color validation
 export const isValidColor = (color: unknown): color is Color => {
