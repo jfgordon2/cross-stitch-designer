@@ -3,15 +3,10 @@
 }
 
 .background-editor-modal {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   background: white;
   padding: 1rem;
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 1100;
   min-width: 280px;
   max-width: 90vw;
 }

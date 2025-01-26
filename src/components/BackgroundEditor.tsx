@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { BackgroundImage, AppMode } from '../types';
 import { BackgroundEditorModal } from './BackgroundEditorModal';
 import './BackgroundEditor.css';
@@ -21,8 +21,35 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
   onModeChange,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [buttonRect, setButtonRect] = useState<DOMRect | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const updateButtonRect = useCallback(() => {
+    if (buttonRef.current) {
+      setButtonRect(buttonRef.current.getBoundingClientRect());
+    }
+  }, []);
+
+  const handleStartEditing = useCallback(() => {
+    if (buttonRef.current) {
+      setButtonRect(buttonRef.current.getBoundingClientRect());
+    }
+    setIsEditing(true);
+  }, []);
+
+  useEffect(() => {
+    if (isEditing) {
+      updateButtonRect();
+      window.addEventListener('scroll', updateButtonRect);
+      window.addEventListener('resize', updateButtonRect);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updateButtonRect);
+      window.removeEventListener('resize', updateButtonRect);
+    };
+  }, [isEditing, updateButtonRect]);
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,7 +78,7 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
           };
 
           onBackgroundChange(newBackground);
-          setIsEditing(true);
+          handleStartEditing();
           onModeChange('background');
         };
         img.src = reader.result as string;
@@ -61,7 +88,7 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
       console.error('Failed to load image:', error);
       alert('Failed to load image. Please try another file.');
     }
-  }, [canvasWidth, canvasHeight, onBackgroundChange, onModeChange]);
+  }, [canvasWidth, canvasHeight, onBackgroundChange, onModeChange, handleStartEditing]);
 
   const handleOpacityChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (!background) return;
@@ -124,7 +151,7 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
       ) : (
         <button
           ref={buttonRef}
-          onClick={() => setIsEditing(true)}
+          onClick={handleStartEditing}
           className="toolbar-button"
           title="Edit background"
         >
@@ -135,6 +162,7 @@ export const BackgroundEditor: React.FC<BackgroundEditorProps> = ({
       {isEditing && background && (
         <BackgroundEditorModal
           background={background}
+          buttonRect={buttonRect}
           onOpacityChange={handleOpacityChange}
           onScaleChange={handleScaleChange}
           onPositionChange={handlePositionChange}

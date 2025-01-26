@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { BackgroundImage } from '../types';
 import './BackgroundEditor.css';
 
 interface BackgroundEditorModalProps {
   background: BackgroundImage;
+  buttonRect: DOMRect | null;
   onOpacityChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onScaleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPositionChange: (dx: number, dy: number) => void;
@@ -14,6 +15,7 @@ interface BackgroundEditorModalProps {
 
 export const BackgroundEditorModal: React.FC<BackgroundEditorModalProps> = ({
   background,
+  buttonRect,
   onOpacityChange,
   onScaleChange,
   onPositionChange,
@@ -23,21 +25,49 @@ export const BackgroundEditorModal: React.FC<BackgroundEditorModalProps> = ({
   const modalRoot = document.getElementById('modal-root');
   if (!modalRoot) return null;
 
+  const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 768px)').matches);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const updateIsMobile = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    
+    mediaQuery.addEventListener('change', updateIsMobile);
+    return () => mediaQuery.removeEventListener('change', updateIsMobile);
+  }, []);
+
+  const getModalStyle = (): CSSProperties => {
+    const baseStyle: CSSProperties = {
+      position: 'fixed',
+      zIndex: 9999,
+      pointerEvents: 'auto',
+      backgroundColor: 'white',
+      padding: '20px',
+      borderRadius: '8px',
+      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
+    };
+
+    if (isMobile) {
+      return {
+        ...baseStyle,
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)'
+      };
+    }
+
+    if (!buttonRect) return baseStyle;
+
+    return {
+      ...baseStyle,
+      top: buttonRect.bottom + window.scrollY + 4,
+      left: buttonRect.left + window.scrollX
+    };
+  };
+
   const modal = (
     <div 
       className="background-editor-modal"
-      style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 9999,
-        pointerEvents: 'auto',
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
-      }}
+      style={getModalStyle()}
     >
       <div className="background-sliders">
         <div className="background-slider-group">

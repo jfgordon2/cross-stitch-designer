@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, memo } from 'react';
+import React, { useState, useRef, useCallback, memo, useEffect } from 'react';
 import { Color } from '../types';
 import { ColorSelectModal } from './ColorSelectModal';
 import './ColorSelect.css';
@@ -19,7 +19,27 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isCustomMode, setIsCustomMode] = useState(false);
   const [customColor, setCustomColor] = useState<Color>(selectedColor);
+  const [buttonRect, setButtonRect] = useState<DOMRect | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const updateButtonRect = () => {
+      if (buttonRef.current) {
+        setButtonRect(buttonRef.current.getBoundingClientRect());
+      }
+    };
+
+    if (isOpen) {
+      updateButtonRect();
+      window.addEventListener('scroll', updateButtonRect);
+      window.addEventListener('resize', updateButtonRect);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updateButtonRect);
+      window.removeEventListener('resize', updateButtonRect);
+    };
+  }, [isOpen]);
 
   const handleCustomColorChange = useCallback((channel: keyof Color, value: number) => {
     setCustomColor(prev => {
@@ -41,7 +61,12 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
     <div className="color-select">
       <button
         ref={buttonRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (buttonRef.current) {
+            setButtonRect(buttonRef.current.getBoundingClientRect());
+          }
+          setIsOpen(!isOpen);
+        }}
         className="color-select-button"
         style={{
           backgroundColor: `rgba(${selectedColor.r}, ${selectedColor.g}, ${selectedColor.b}, ${selectedColor.a / 255})`
@@ -54,6 +79,7 @@ const ColorSelectComponent: React.FC<ColorSelectProps> = ({
           customColors={customColors}
           customColor={customColor}
           isCustomMode={isCustomMode}
+          buttonRect={buttonRect}
           onColorChange={onColorChange}
           onCustomColorChange={handleCustomColorChange}
           onCustomModeToggle={() => setIsCustomMode(!isCustomMode)}

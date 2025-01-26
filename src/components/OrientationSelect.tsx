@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useState, useEffect } from 'react';
+import React, { memo, useCallback, useState, useEffect, useRef } from 'react';
 import { StitchType, Orientation } from '../types';
 import { ORIENTATION_OPTIONS } from '../constants';
 import { StitchSVG } from './StitchSVG';
@@ -44,6 +44,8 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [buttonRect, setButtonRect] = useState<DOMRect | null>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateMobileState = () => {
@@ -54,6 +56,25 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
     window.addEventListener('resize', updateMobileState);
     return () => window.removeEventListener('resize', updateMobileState);
   }, []);
+
+  useEffect(() => {
+    const updateButtonRect = () => {
+      if (buttonRef.current) {
+        setButtonRect(buttonRef.current.getBoundingClientRect());
+      }
+    };
+
+    if (isOpen) {
+      updateButtonRect();
+      window.addEventListener('scroll', updateButtonRect);
+      window.addEventListener('resize', updateButtonRect);
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updateButtonRect);
+      window.removeEventListener('resize', updateButtonRect);
+    };
+  }, [isOpen]);
 
   const handleOptionClick = useCallback((orientation: string) => {
     onOrientationChange(orientation);
@@ -76,12 +97,17 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
   }
 
   return (
-    <div className="orientation-container">
+    <div ref={buttonRef} className="orientation-container">
       <SelectButton
         selectedStitch={selectedStitch}
         selectedOrientation={selectedOrientation}
         size={stitchSize}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (buttonRef.current) {
+            setButtonRect(buttonRef.current.getBoundingClientRect());
+          }
+          setIsOpen(!isOpen);
+        }}
       />
       
       {isOpen && (
@@ -89,6 +115,7 @@ const OrientationSelectComponent: React.FC<OrientationSelectProps> = ({
           selectedStitch={selectedStitch}
           selectedOrientation={selectedOrientation}
           orientations={orientations}
+          buttonRect={buttonRect}
           stitchSize={stitchSize}
           onOptionClick={handleOptionClick}
         />

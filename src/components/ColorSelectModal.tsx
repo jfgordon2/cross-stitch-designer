@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { Color } from '../types';
 import { COLORS } from '../constants';
@@ -9,6 +9,7 @@ interface ColorSelectModalProps {
   customColors: Color[];
   customColor: Color;
   isCustomMode: boolean;
+  buttonRect: DOMRect | null;
   onColorChange: (color: Color) => void;
   onCustomColorChange: (channel: keyof Color, value: number) => void;
   onCustomModeToggle: () => void;
@@ -76,6 +77,7 @@ export const ColorSelectModal: React.FC<ColorSelectModalProps> = ({
   customColors,
   customColor,
   isCustomMode,
+  buttonRect,
   onColorChange,
   onCustomColorChange,
   onCustomModeToggle,
@@ -85,24 +87,52 @@ export const ColorSelectModal: React.FC<ColorSelectModalProps> = ({
   const modalRoot = document.getElementById('modal-root');
   if (!modalRoot) return null;
 
+  const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 768px)').matches);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const updateIsMobile = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    
+    mediaQuery.addEventListener('change', updateIsMobile);
+    return () => mediaQuery.removeEventListener('change', updateIsMobile);
+  }, []);
+
   const isColorEqual = (a: Color, b: Color) =>
     a.r === b.r && a.g === b.g && a.b === b.b && a.a === b.a;
+
+  const getModalStyle = (): CSSProperties => {
+    const baseStyle: CSSProperties = {
+      position: 'fixed',
+      zIndex: 9999,
+      pointerEvents: 'auto',
+      backgroundColor: 'white',
+      padding: '20px',
+      borderRadius: '8px',
+      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
+    };
+
+    if (isMobile) {
+      return {
+        ...baseStyle,
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)'
+      };
+    }
+
+    if (!buttonRect) return baseStyle;
+
+    return {
+      ...baseStyle,
+      top: buttonRect.bottom + window.scrollY + 4,
+      left: buttonRect.left + window.scrollX
+    };
+  };
 
   const modal = (
     <div 
       className="color-dropdown"
-      style={{
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 9999,
-        pointerEvents: 'auto',
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
-      }}
+      style={getModalStyle()}
     >
       <div className="color-grid">
         {[...COLORS, ...customColors].map((color, index) => (
