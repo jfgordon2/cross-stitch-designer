@@ -54,7 +54,7 @@ export const PrintButton: React.FC<PrintButtonProps> = ({ project, gridRef }) =>
     const requiredWidth = effectiveWidth * MAX_CELL_SIZE_MM;
     
     // Use the smaller of available width or required width
-    const maxWidth = Math.min(180, requiredWidth); // 180mm is A4 width minus margins
+    const maxWidth = Math.min(185.9, requiredWidth); // 185.9mm is US Letter width minus margins
     
     const cellSizeInMm = maxWidth / effectiveWidth;
     const calculatedHeight = cellSizeInMm * effectiveHeight;
@@ -146,7 +146,7 @@ export const PrintButton: React.FC<PrintButtonProps> = ({ project, gridRef }) =>
             ${printStyles}
             
             @page {
-              size: ${needsRotation ? 'A4 landscape' : 'A4'};
+              size: ${needsRotation ? 'letter landscape' : 'letter'};
               margin: 15mm;
             }
             
